@@ -9,7 +9,8 @@ add_executable(Image_Processing_C___Test main.cpp
         loop.cpp
         math.cpp
         assets.cpp
-        vector.cpp)
+        vector.cpp
+        camera.cpp)
 
 set(OpenCV_DIR "/opt/homebrew/opt/opencv/lib/cmake/opencv4")
 

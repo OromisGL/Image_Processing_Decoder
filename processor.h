@@ -35,6 +35,8 @@ struct Ball
 struct Screen
 {
     std::vector<cv::Point2d> drawPoints;
+    int width = 1280;
+    int height = 720;
 };
 
 struct screen_M
@@ -56,6 +58,7 @@ struct INITIAL_CAMERA_POSITION
 
 class Processor {
 private:
+    cv::Mat K_orig_, D_;
     Screen screen;
     color_count count;
     Ball red_ball, green_ball, blue_ball;
@@ -71,8 +74,10 @@ private:
     cv::Point2d target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2);
     void crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output);
     void draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints);
+    void virtual_camera(cv::Mat& frame);
+    void orig_camera();
     // Test Function
-    //cv::Mat image_color_field(const std::string& img_path, const std::string& img_name);
+    // cv::Mat image_color_field(const std::string& img_path, const std::string& img_name);
 public:
     Processor() = default;
     cv::VideoCapture in_video(const std::string& video_path);
