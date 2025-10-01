@@ -27,3 +27,9 @@ cv::Point2d Processor::target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2)
 
     return {static_cast<float>(length_hypot), static_cast<float>(target)};
 }
+
+void distance(Ball& p1, INITIAL_CAMERA_POSITION p2, INITIAL_DISTANCE_TO_BALL ball_distance)
+{
+    for (const auto& p : p1.positions)
+         ball_distance.distances.push_back(std::hypot(p.x - p2.x, p.y - p2.y, p.z - p2.z));
+}

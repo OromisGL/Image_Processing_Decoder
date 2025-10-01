@@ -1,6 +1,21 @@
 %YAML:1.0
-K: !!opencv-matrix [  fx, 0, cx, 0, fy, cy, 0, 0, 1  ]
-D: [ k1, k2, p1, p2, k3 ]      # oder fisheye: [k1,k2,k3,k4]
-image_width:  1920
-image_height: 1080
-model: pinhole                  # oder fisheye
+camera:
+  model: pinhole             # oder 'fisheye'
+  image_width:  1920
+  image_height: 1080
+
+  # 3x3-Intrinsikmatrix K
+  K: !!opencv-matrix
+    rows: 3
+    cols: 3
+    dt: d
+    data: [ 1200.0, 0.0, 960.0,
+            0.0, 1200.0, 540.0,
+            0.0, 0.0, 1.0 ]
+
+  # Distortion-Koeffizienten (Brown–Conrady: k1,k2,p1,p2,k3)
+  D: !!opencv-matrix
+    rows: 1
+    cols: 5
+    dt: d
+    data: [ -0.25, 0.05, 0.0005, -0.0003, -0.01 ]

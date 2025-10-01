@@ -3,31 +3,44 @@
 //
 
 #pragma once
-#include <string>
 #include <iostream>
-#include <opencv2/videoio.hpp>
+#include <iomanip>
+#include <string>
 #include <vector>
+#include <cmath>
+#include <filesystem>
+#include <unordered_set>
+#include <opencv2/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include <math.h>
-#include <iostream>
-#include <opencv2/videoio.hpp>
-#include <filesystem>
-#include <iomanip>
-#include "opencv2/calib3d/calib3d.hpp"
-#include <unordered_set>
+#include "opencv2/calib3d.hpp"
+#include <opencv2/viz/viz3d.hpp>
 
 struct color_count
 {
     int red = 0, green = 0, blue = 0;
 };
 
+struct Ball_Properties
+{
+    float x;
+    float y;
+    float z;
+    float radius;
+    cv::Scalar color;
+};
+
+struct dimension
+{
+    double x, y, z;
+};
+
 struct Ball
 {
     std::string name;
-    int64_t x = 0, y = 0;
-    std::vector<std::pair<int, int>> positions;
+    int64_t x = 0, y = 0, z = 0;
+    std::vector<dimension> positions;
     std::pair<double, double> middle;
     double radius;
 };
@@ -47,40 +60,67 @@ struct screen_M
 
 struct INITIAL_CAMERA_POSITION
 {
-    float BALL_RADIUS = 3;
-    float DISTANCE_BETWEEN_BALL = 9;
-    float PEN_HEIGHT = 270 + 180;
+    float PEN_HEIGHT = 18;
     float INITIAL_Z_OFFSET = 18;
-    int x = (1280 / 2);
+    int x = 0;
     float y = PEN_HEIGHT;
     float z = INITIAL_Z_OFFSET;
 };
 
+struct Intrinsics {
+    cv::Mat K;       // 3x3, CV_64F
+    cv::Mat D;       // 1x5 (pinhole) oder 1x4 (fisheye), CV_64F
+    cv::Size size;   // Bildgröße der Originalaufnahme
+    bool fisheye = false;
+};
+
+struct VirtualCam {
+    cv::Mat Knew;     // Ziel-Intrinsics (3x3, CV_64F)
+    cv::Mat map1, map2; // Remap-Tabellen
+    cv::Size outSize; // Zielgröße
+};
+
+struct INITIAL_DISTANCE_TO_BALL {
+    std::vector<double> distances;
+    void distance(Ball& p1, INITIAL_CAMERA_POSITION p2);
+};
+
 class Processor {
-private:
+public:
+    INITIAL_CAMERA_POSITION camera_position;
+    VirtualCam Vcam;
+    Intrinsics Ocam;
     cv::Mat K_orig_, D_;
     Screen screen;
     color_count count;
     Ball red_ball, green_ball, blue_ball;
+    float BALL_RADIUS = 3;
+    float DISTANCE_BETWEEN_BALL = 9;
     static constexpr int threshold = 80;
+    // Drwaing
+    std::vector<Ball_Properties> initializeBalls();
     void m_display_info(cv::Mat& frame, cv::Mat& out);
-    void m_frame_processing(cv::Mat& input, cv::Mat& output);
-    void add_x_y(Ball& b);
-    void middle_point(Ball& b);
     void draw_line_to_camera(Ball& b, cv::Mat& img);
     void draw_line(cv::Mat& img, cv::Point2f p1, cv::Point2f p2);
+    void draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints);
+    // Frame Processor Function
+    void m_frame_processing(cv::Mat& input, cv::Mat& output);
+    // Math Functions
+    void add_x_y_z(Ball& b);
+    void middle_point(Ball& b);
+    void crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output);
+    //Vector Functions
     double vektor_length(cv::Point2f p1, cv::Point2f p2);
     cv::Point2d middle_two_vek(cv::Point2d p1, cv::Point2d p2);
     cv::Point2d target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2);
-    void crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output);
-    void draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints);
-    void virtual_camera(cv::Mat& frame);
-    void orig_camera();
     // Test Function
     // cv::Mat image_color_field(const std::string& img_path, const std::string& img_name);
-public:
-    Processor() = default;
+    // Video Input
     cv::VideoCapture in_video(const std::string& video_path);
     void video_loop(cv::VideoCapture& img);
+    //Camera Settings and Virtual Camera
+    void virtual_camera_setting(double fov_deg);
+    void orig_camera();
+    cv::Mat applyVcam(const cv::Mat& frame);
 
 };

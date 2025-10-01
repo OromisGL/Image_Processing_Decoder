@@ -58,12 +58,13 @@ void Processor::middle_point(Ball& b)
     b.middle.second = static_cast<double>(b.y) / n;
 }
 
-void Processor::add_x_y(Ball& b)
+void Processor::add_x_y_z(Ball& b)
 {
     for (const auto& p : b.positions)
     {
-        b.x += p.first;
-        b.y += p.second;
+        b.x += p.x;
+        b.y += p.y;
+        b.z += p.z;
     }
 }
 

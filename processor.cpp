@@ -7,6 +7,7 @@
 
 void Processor::m_frame_processing(cv::Mat& input, cv::Mat& output)
 {
+    INITIAL_DISTANCE_TO_BALL ball_distance;
 
     this->blue_ball.positions.clear();
     this->green_ball.positions.clear();
@@ -49,13 +50,13 @@ void Processor::m_frame_processing(cv::Mat& input, cv::Mat& output)
 
             if (newB == 255)
             {
-                this->blue_ball.positions.emplace_back(x,y);
+                this->blue_ball.positions.emplace_back(x, y, 0);
             }
             else if (newG == 255) {
-                this->green_ball.positions.emplace_back(x,y);
+                this->green_ball.positions.emplace_back(x, y, 0);
             }
             else if (newR == 255) {
-                this->red_ball.positions.emplace_back(x,y);
+                this->red_ball.positions.emplace_back(x, y, 0);
             }
             out_row[x] = cv::Vec3b(
                 static_cast<uchar>(newB),
@@ -69,9 +70,9 @@ void Processor::m_frame_processing(cv::Mat& input, cv::Mat& output)
     green_field = green_ball.positions.size();
     red_field = red_ball.positions.size();
 
-    add_x_y(blue_ball);
-    add_x_y(green_ball);
-    add_x_y(red_ball);
+    add_x_y_z(blue_ball);
+    add_x_y_z(green_ball);
+    add_x_y_z(red_ball);
 
     middle_point(blue_ball);
     middle_point(green_ball);

@@ -10,18 +10,17 @@ add_executable(Image_Processing_C___Test main.cpp
         math.cpp
         assets.cpp
         vector.cpp
-        camera.cpp)
+        camera.cpp
+        Canvas/Canvas.cpp
+        Canvas/Canvas.h)
 
 set(OpenCV_DIR "/opt/homebrew/opt/opencv/lib/cmake/opencv4")
+set(OpenMVG_DIR "$ENV{HOME}/local/openmvg/lib/openMVG")
 
-find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs highgui)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs highgui calib3d viz)
+find_package(OpenMVG REQUIRED CONFIG)
 
-target_link_libraries(Image_Processing_C___Test PRIVATE
-        opencv_core
-        opencv_imgproc
-        opencv_imgcodecs
-        opencv_highgui
-)
+target_link_libraries(Image_Processing_C___Test PRIVATE ${OpenCV_LIBS})
 
 set_target_properties(Image_Processing_C___Test PROPERTIES
         MACOSX_RPATH ON

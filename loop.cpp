@@ -21,6 +21,8 @@ void Processor::video_loop(cv::VideoCapture& img)
 
     cv::Mat frame, out;
 
+    virtual_camera_setting(90);
+
     while (true)
     {
         img.read(frame);
@@ -28,13 +30,16 @@ void Processor::video_loop(cv::VideoCapture& img)
         if (frame.empty())
             break;
 
-        out.create(frame.size(), frame.type());
+        // out.create(frame.size(), frame.type());
+
+        out = applyVcam(frame);
 
         m_frame_processing(frame, out);
+
         m_display_info(frame, out);
         draw_to_screen(out, screen.drawPoints);
 
-        cv::imshow("video input", frame);
+        // cv::imshow("video input", frame);
         cv::imshow("video output", out);
 
 

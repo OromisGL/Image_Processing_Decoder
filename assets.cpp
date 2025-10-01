@@ -4,6 +4,49 @@
 
 #include "processor.h"
 
+
+std::vector<Ball_Properties> Processor::initializeBalls()
+{
+    Ball_Properties redball;
+    Ball_Properties greenball;
+    Ball_Properties blueball;
+    const auto triangle_length = DISTANCE_BETWEEN_BALL;
+    const float left = -triangle_length / 2;
+    const float right = triangle_length / 2;
+
+    const float triangle_height = triangle_length * std::sqrt(3) / 2;
+    const float bottom = camera_position.PEN_HEIGHT - triangle_height / 3;
+    const float top = camera_position.PEN_HEIGHT + triangle_height * 2 / 3;
+
+    const float radius = BALL_RADIUS;
+
+    std::vector<Ball_Properties> Ball_set;
+
+    redball.x = 0;
+    redball.y = top;
+    redball.z = 0;
+    redball.radius = radius;
+    redball.color = cv::Scalar(0, 0, 255);
+
+    greenball.x = right;
+    greenball.y = bottom;
+    greenball.z = 0;
+    greenball.radius = radius;
+    greenball.color = cv::Scalar(0,255,0);
+
+    blueball.x = left;
+    blueball.y = bottom;
+    blueball.z = 0;
+    blueball.radius = radius;
+    blueball.color = cv::Scalar(255,0,0);
+
+    //Ball_set.push_back(redball);
+    Ball_set.push_back(greenball);
+    Ball_set.push_back(blueball);
+
+    return Ball_set;
+}
+
 void Processor::draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints)
 {
     crossing_point(out, drawPoints);
@@ -43,7 +86,7 @@ void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
 
 
     draw_line(out, blue_middle, green_middle);
-    draw_line(out, blue_green_center, target);
+    // draw_line(out, blue_green_center, target);
 
 
 
