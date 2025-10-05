@@ -5,12 +5,12 @@
 #include "processor.h"
 
 
-std::vector<Ball_Properties> Processor::initializeBalls()
+std::vector<Ball> Processor::initializeBalls()
 {
-    Ball_Properties redball;
-    Ball_Properties greenball;
-    Ball_Properties blueball;
-    const auto triangle_length = DISTANCE_BETWEEN_BALL;
+    Ball redball;
+    Ball greenball;
+    Ball blueball;
+    const float triangle_length = DISTANCE_BETWEEN_BALL;
     const float left = -triangle_length / 2;
     const float right = triangle_length / 2;
 
@@ -18,31 +18,26 @@ std::vector<Ball_Properties> Processor::initializeBalls()
     const float bottom = camera_position.PEN_HEIGHT - triangle_height / 3;
     const float top = camera_position.PEN_HEIGHT + triangle_height * 2 / 3;
 
-    const float radius = BALL_RADIUS;
+    std::vector<Ball> Ball_set;
 
-    std::vector<Ball_Properties> Ball_set;
-
-    redball.x = 0;
-    redball.y = top;
-    redball.z = 0;
-    redball.radius = radius;
+    redball.positions.x = 0;
+    redball.positions.y = top;
+    redball.positions.z = 0;
     redball.color = cv::Scalar(0, 0, 255);
 
-    greenball.x = right;
-    greenball.y = bottom;
-    greenball.z = 0;
-    greenball.radius = radius;
+    greenball.positions.x = right;
+    greenball.positions.y = bottom;
+    greenball.positions.z = 0;
     greenball.color = cv::Scalar(0,255,0);
 
-    blueball.x = left;
-    blueball.y = bottom;
-    blueball.z = 0;
-    blueball.radius = radius;
+    blueball.positions.x = left;
+    blueball.positions.y = bottom;
+    blueball.positions.z = 0;
     blueball.color = cv::Scalar(255,0,0);
 
-    //Ball_set.push_back(redball);
-    Ball_set.push_back(greenball);
     Ball_set.push_back(blueball);
+    Ball_set.push_back(greenball);
+    // Ball_set.push_back(redball);
 
     return Ball_set;
 }
@@ -66,12 +61,12 @@ void Processor::draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoint
     );
 }
 
-void Processor::draw_line(cv::Mat& img, cv::Point2f p1, cv::Point2f p2)
+void Processor::draw_line(cv::Mat& img, cv::Point2f p1, cv::Point2f p2, cv::Scalar color = cv::Scalar(255,255,255))
 {
     cv::line(img,
              cv::Point(cvRound(p1.x),    cvRound(p1.y)),
              cv::Point(cvRound(p2.x), cvRound(p2.y)),
-             cv::Scalar(255,255,255), 1, cv::LINE_AA);
+             color , 1, cv::LINE_AA);
 }
 
 void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
@@ -188,18 +183,21 @@ void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
         cv::FILLED,
         cv::LINE_AA
         );
+
     cv::circle(
         out,
         {static_cast<int>(blue_ball.middle.first), static_cast<int>(blue_ball.middle.second)},
-        static_cast<int>(blue_ball.radius) + 180, cv::Scalar(255,255,255),
+        static_cast<int>(blue_ball.distances / 5), cv::Scalar(255,255,255),
         1,
         cv::LINE_AA);
+
     cv::circle(
         out,
         {static_cast<int>(green_ball.middle.first), static_cast<int>(green_ball.middle.second)},
-        static_cast<int>(green_ball.radius) + 180, cv::Scalar(255,255,255),
+        static_cast<int>(green_ball.distances / 5), cv::Scalar(255,255,255),
         1,
         cv::LINE_AA);
+
     cv::circle(
         frame,
         {static_cast<int>(red_ball.middle.first), static_cast<int>(red_ball.middle.second)},

@@ -3,6 +3,8 @@
 //
 
 #include "processor.h"
+#include "Canvas/Canvas.h"
+#include "setter.h"
 
 void Processor::video_loop(cv::VideoCapture& img)
 {
@@ -21,7 +23,10 @@ void Processor::video_loop(cv::VideoCapture& img)
 
     cv::Mat frame, out;
 
-    virtual_camera_setting(90);
+    Canvas& canvas_ = getCanvas();
+    Processor& processor_ = getProcessor();
+
+    //virtual_camera_setting(90);
 
     while (true)
     {
@@ -30,14 +35,16 @@ void Processor::video_loop(cv::VideoCapture& img)
         if (frame.empty())
             break;
 
-        // out.create(frame.size(), frame.type());
+        out.create(frame.size(), frame.type());
 
-        out = applyVcam(frame);
+        //out = applyVcam(frame);
 
-        m_frame_processing(frame, out);
+        processor_.m_frame_processing(frame, out);
 
-        m_display_info(frame, out);
-        draw_to_screen(out, screen.drawPoints);
+        canvas_.displayCanvas();
+
+        processor_.m_display_info(frame, out);
+        //draw_to_screen(out, screen.drawPoints);
 
         // cv::imshow("video input", frame);
         cv::imshow("video output", out);

@@ -8,6 +8,10 @@ int screen_x = 1280 / 2;
 int screen_y = 720 / 2;
 
 
+double Processor::get_delta(Ball& b)
+{
+    return b.distances
+}
 
 void Processor::crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output)
 {
@@ -49,23 +53,13 @@ void Processor::crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output)
 
 void Processor::middle_point(Ball& b)
 {
-    const auto n = static_cast<double>(b.positions.size());
+    const auto n = b.field;
 
     if (n == 0)
         return;
 
-    b.middle.first = static_cast<double>(b.x) / n;
-    b.middle.second = static_cast<double>(b.y) / n;
-}
-
-void Processor::add_x_y_z(Ball& b)
-{
-    for (const auto& p : b.positions)
-    {
-        b.x += p.x;
-        b.y += p.y;
-        b.z += p.z;
-    }
+    b.middle.first = b.positions.x / static_cast<double>(n);
+    b.middle.second = b.positions.y / static_cast<double>(n);
 }
 
 void Processor::draw_line_to_camera(Ball& b, cv::Mat& img)

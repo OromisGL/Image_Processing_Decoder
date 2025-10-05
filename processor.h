@@ -17,18 +17,11 @@
 #include "opencv2/calib3d.hpp"
 #include <opencv2/viz/viz3d.hpp>
 
+
+
 struct color_count
 {
     int red = 0, green = 0, blue = 0;
-};
-
-struct Ball_Properties
-{
-    float x;
-    float y;
-    float z;
-    float radius;
-    cv::Scalar color;
 };
 
 struct dimension
@@ -40,8 +33,11 @@ struct Ball
 {
     std::string name;
     int64_t x = 0, y = 0, z = 0;
-    std::vector<dimension> positions;
+    dimension positions;
+    double distances;
     std::pair<double, double> middle;
+    cv::Scalar color;
+    int field;
     double radius;
 };
 
@@ -62,6 +58,8 @@ struct INITIAL_CAMERA_POSITION
 {
     float PEN_HEIGHT = 18;
     float INITIAL_Z_OFFSET = 18;
+    double initial_green;
+    double initial_blue;
     int x = 0;
     float y = PEN_HEIGHT;
     float z = INITIAL_Z_OFFSET;
@@ -80,13 +78,10 @@ struct VirtualCam {
     cv::Size outSize; // Zielgröße
 };
 
-struct INITIAL_DISTANCE_TO_BALL {
-    std::vector<double> distances;
-    void distance(Ball& p1, INITIAL_CAMERA_POSITION p2);
-};
 
 class Processor {
 public:
+
     INITIAL_CAMERA_POSITION camera_position;
     VirtualCam Vcam;
     Intrinsics Ocam;
@@ -98,18 +93,19 @@ public:
     float DISTANCE_BETWEEN_BALL = 9;
     static constexpr int threshold = 80;
     // Drwaing
-    std::vector<Ball_Properties> initializeBalls();
+    std::vector<Ball> initializeBalls();
     void m_display_info(cv::Mat& frame, cv::Mat& out);
     void draw_line_to_camera(Ball& b, cv::Mat& img);
-    void draw_line(cv::Mat& img, cv::Point2f p1, cv::Point2f p2);
+    void draw_line(cv::Mat& img, cv::Point2f p1, cv::Point2f p2, cv::Scalar color);
     void draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints);
     // Frame Processor Function
     void m_frame_processing(cv::Mat& input, cv::Mat& output);
     // Math Functions
-    void add_x_y_z(Ball& b);
     void middle_point(Ball& b);
     void crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output);
     //Vector Functions
+    void euclidian_distance_3D(Ball& p1, INITIAL_CAMERA_POSITION p2);
+    void euclidian_distance_2D(Ball& p1, INITIAL_CAMERA_POSITION p2);
     double vektor_length(cv::Point2f p1, cv::Point2f p2);
     cv::Point2d middle_two_vek(cv::Point2d p1, cv::Point2d p2);
     cv::Point2d target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2);

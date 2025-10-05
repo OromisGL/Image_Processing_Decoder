@@ -12,7 +12,9 @@ add_executable(Image_Processing_C___Test main.cpp
         vector.cpp
         camera.cpp
         Canvas/Canvas.cpp
-        Canvas/Canvas.h)
+        Canvas/Canvas.h
+        setter.h
+        setter.cpp)
 
 set(OpenCV_DIR "/opt/homebrew/opt/opencv/lib/cmake/opencv4")
 set(OpenMVG_DIR "$ENV{HOME}/local/openmvg/lib/openMVG")
