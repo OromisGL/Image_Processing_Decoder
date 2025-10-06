@@ -5,17 +5,20 @@
 #include "processor.h"
 #include "Canvas/Canvas.h"
 #include <memory>
+#include "setter.h"
 
 
 void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
 {
-    this->blue_ball.positions.x = 0;
-    this->green_ball.positions.x = 0;
-    this->red_ball.positions.x = 0;
+    Processor& processor_ = getProcessor();
 
-    this->blue_ball.positions.y = 0;
-    this->green_ball.positions.y = 0;
-    this->red_ball.positions.y = 0;
+    processor_.blue_ball.positions.x = 0;
+    processor_.green_ball.positions.x = 0;
+    processor_.red_ball.positions.x = 0;
+
+    processor_.blue_ball.positions.y = 0;
+    processor_.green_ball.positions.y = 0;
+    processor_.red_ball.positions.y = 0;
 
     uint32_t blue_field = 0, green_field = 0, red_field = 0;
 
@@ -40,9 +43,9 @@ void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
             int newG = diffG > threshold ? 255 : 0;
             int newR = diffR > threshold ? 255 : 0;
 
-            if (newB == 255){ blue_field += 1; blue_ball.positions.x += x;  blue_ball.positions.y += y; }
-            else if (newG == 255){ green_field += 1; green_ball.positions.x += x;  green_ball.positions.y += y; }
-            else if (newR == 255){ red_field += 1; red_ball.positions.x += x;  red_ball.positions.y += y;}
+            if (newB == 255){ blue_field += 1; processor_.blue_ball.positions.x += x;  processor_.blue_ball.positions.y += y; }
+            else if (newG == 255){ green_field += 1; processor_.green_ball.positions.x += x;  processor_.green_ball.positions.y += y; }
+            else if (newR == 255){ red_field += 1; processor_.red_ball.positions.x += x;  processor_.red_ball.positions.y += y; }
 
             out_row[x] = cv::Vec3b(
                 static_cast<uchar>(newB),
@@ -52,28 +55,41 @@ void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
         }
     }
 
-    blue_ball.field = static_cast<int>(blue_field);
-    green_ball.field = static_cast<int>(green_field);
-    red_ball.field = static_cast<int>(red_field);
+    processor_.blue_ball.field = static_cast<int>(blue_field);
+    processor_.green_ball.field = static_cast<int>(green_field);
+    processor_.red_ball.field = static_cast<int>(red_field);
 
-    middle_point(blue_ball);
-    middle_point(green_ball);
-    middle_point(red_ball);
+    middle_point(processor_.blue_ball);
+    middle_point(processor_.green_ball);
+    middle_point(processor_.red_ball);
 
-    this->blue_ball.radius = std::sqrt(static_cast<double>(blue_ball.field) / M_PI);
-    this->green_ball.radius = std::sqrt(static_cast<double>(green_ball.field) / M_PI);
-    this->red_ball.radius = std::sqrt(static_cast<double>(red_ball.field) / M_PI);
+    processor_.blue_ball.radius = std::sqrt(static_cast<double>(processor_.blue_ball.field) / M_PI);
+    processor_.green_ball.radius = std::sqrt(static_cast<double>(processor_.green_ball.field) / M_PI);
+    processor_.red_ball.radius = std::sqrt(static_cast<double>(processor_.red_ball.field) / M_PI);
 
-    euclidian_distance_3D(green_ball, camera_position);
-    euclidian_distance_3D(blue_ball, camera_position);
+    if (processor_.camera_position.initial_blue_radii == 0.0 || processor_.camera_position.initial_green_radii == 0.0)
+    {
+        processor_.camera_position.initial_blue_radii = processor_.blue_ball.radius;
+        processor_.camera_position.initial_green_radii = processor_.green_ball.radius;
+    }
 
-    camera_position.z = green_ball.distances * (std::sqrt(3) / 2);
+    if (processor_.camera_position.initial_blue_distance == 0.0 || processor_.camera_position.initial_green_distance == 0.0)
+    {
+        processor_.camera_position.initial_blue_distance = euclidian_distance_3D(processor_.blue_ball, processor_.camera_position);
+        processor_.camera_position.initial_green_distance = euclidian_distance_3D(processor_.green_ball, camera_position);
+    }
+
+    double blue_ratio = processor_.camera_position.initial_blue_radii / processor_.blue_ball.radius;
+    double green_ratio = processor_.camera_position.initial_green_radii / processor_.green_ball.radius;
+
+    processor_.blue_ball.distances = processor_.camera_position.initial_blue_distance * blue_ratio;
+    processor_.green_ball.distances = processor_.camera_position.initial_green_distance * green_ratio;
+
+    // euclidian_distance_3D(processor_.green_ball, processor_.camera_position);
+    // euclidian_distance_3D(processor_.blue_ball, processor_.camera_position);
 
     //euclidian_distance_2D(blue_ball, camera_position);
     //euclidian_distance_2D(green_ball, camera_position);
-
-    //camera_position.initial_blue = blue_ball.distances;
-    //camera_position.initial_green = green_ball.distances;
 
     //std::cout << "\r"
     //      << "Red radii: "   << std::fixed  << red_ball.radius

@@ -14,6 +14,7 @@ void Processor::video_loop(cv::VideoCapture& img)
 
     int delay = 1;
 
+
     double fps = img.get(cv::CAP_PROP_FPS);
 
     if (fps > 0)
@@ -38,15 +39,15 @@ void Processor::video_loop(cv::VideoCapture& img)
         out.create(frame.size(), frame.type());
 
         //out = applyVcam(frame);
+        processor_.framecount++;
+        canvas_.displayCanvas();
 
         processor_.m_frame_processing(frame, out);
-
-        canvas_.displayCanvas();
 
         processor_.m_display_info(frame, out);
         //draw_to_screen(out, screen.drawPoints);
 
-        // cv::imshow("video input", frame);
+        cv::imshow("video input", frame);
         cv::imshow("video output", out);
 
 

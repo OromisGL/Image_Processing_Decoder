@@ -3,6 +3,7 @@
 //
 
 #include "processor.h"
+#include "setter.h"
 
 int screen_x = 1280 / 2;
 int screen_y = 720 / 2;
@@ -10,13 +11,15 @@ int screen_y = 720 / 2;
 
 double Processor::get_delta(Ball& b)
 {
-    return b.distances
+    return b.distances;
 }
+
+
 
 void Processor::crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output)
 {
-    cv::Point2d blue_middle(blue_ball.middle.first,blue_ball.middle.second);
-    cv::Point2d green_middle(green_ball.middle.first, green_ball.middle.second);
+    cv::Point2d blue_middle(blue_ball.x, blue_ball.y);
+    cv::Point2d green_middle(green_ball.x, green_ball.y);
 
     double dx = green_middle.x - blue_middle.x;
     double dy = green_middle.y - blue_middle.y;
@@ -24,11 +27,11 @@ void Processor::crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output)
     cv::Point2d direction(dx,dy);
 
     double d = std::hypot(dx, dy);
-    double newBlueradius = blue_ball.radius + 180;
-    double newGreenradius = green_ball.radius + 180;
+    double blueradius = blue_ball.distances;
+    double greenradius = green_ball.distances;
 
-    double rBsqrt = newBlueradius * newBlueradius;
-    double rGsqrt = newGreenradius * newGreenradius;
+    double rBsqrt = blueradius * blueradius;
+    double rGsqrt = greenradius * greenradius;
     double dsqrt = d * d;
 
     double a = (rBsqrt - rGsqrt + dsqrt) / (2 * d);
@@ -64,7 +67,6 @@ void Processor::middle_point(Ball& b)
 
 void Processor::draw_line_to_camera(Ball& b, cv::Mat& img)
 {
-    INITIAL_CAMERA_POSITION camera;
     cv::Point2f p1(b.middle.first,b.middle.second);
 
     cv::Point2f p2(screen_x, screen_y + 360);

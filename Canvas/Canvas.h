@@ -9,7 +9,6 @@
 
 class Canvas : Processor {
 public:
-    std::vector<Ball> Ball_set = initializeBalls();
     cv::Mat draw2DCanvas(int width, int height, const cv::Scalar& background);
     void drawOut(cv::Mat& canvas);
     void displayCanvas();

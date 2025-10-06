@@ -28,12 +28,12 @@ cv::Point2d Processor::target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2)
     return {static_cast<float>(length_hypot), static_cast<float>(target)};
 }
 
-void Processor::euclidian_distance_3D(Ball& p1, INITIAL_CAMERA_POSITION p2)
+double Processor::euclidian_distance_3D(Ball& p1, INITIAL_CAMERA_POSITION& p2)
 {
-    p1.distances = std::hypot(p1.middle.first - p2.x, p1.middle.second - p2.y, p1.z - p2.z);
+    return std::hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
 }
 
-void Processor::euclidian_distance_2D(Ball& p1, INITIAL_CAMERA_POSITION p2)
+double Processor::euclidian_distance_2D(Ball& p1, INITIAL_CAMERA_POSITION& p2)
 {
-    p1.distances = std::hypot(p1.middle.first - p2.x, p1.z - p2.z);
+    return std::hypot(p1.x - p2.x, p1.z - p2.z);
 }
