@@ -47,7 +47,7 @@ void Processor::video_loop(cv::VideoCapture& img)
         processor_.m_display_info(frame, out);
         //draw_to_screen(out, screen.drawPoints);
 
-        cv::imshow("video input", frame);
+        //cv::imshow("video input", frame);
         cv::imshow("video output", out);
 
 

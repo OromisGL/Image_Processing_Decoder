@@ -23,23 +23,23 @@ void Processor::initializeBalls()
     const float bottom = camera_position.PEN_HEIGHT - triangle_height / 3;
     const float top = camera_position.PEN_HEIGHT + triangle_height * 2 / 3;
 
-    processor_.blue_ball.id = 1;
-    processor_.blue_ball.x = 0;
-    processor_.blue_ball.y = top;
+    processor_.blue_ball.id = 0;
+    processor_.blue_ball.x = left;
+    processor_.blue_ball.y = bottom;
     processor_.blue_ball.z = 0;
-    processor_.blue_ball.color = cv::Scalar(0, 0, 255);
+    processor_.blue_ball.color = cv::Scalar(255, 0, 0);
 
-    processor_.green_ball.id = 2;
+    processor_.green_ball.id = 1;
     processor_.green_ball.x = right;
     processor_.green_ball.y = bottom;
     processor_.green_ball.z = 0;
     processor_.green_ball.color = cv::Scalar(0,255,0);
 
-    processor_.red_ball.id = 3;
-    processor_.red_ball.x = left;
-    processor_.red_ball.y = bottom;
+    processor_.red_ball.id = 2;
+    processor_.red_ball.x = 0;
+    processor_.red_ball.y = top;
     processor_.red_ball.z = 0;
-    processor_.red_ball.color = cv::Scalar(255,0,0);
+    processor_.red_ball.color = cv::Scalar(0,0,255);
 }
 
 void Processor::draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints)

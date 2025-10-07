@@ -28,6 +28,9 @@ void Canvas::drawOut(cv::Mat &canvas)
     for (const auto& current_ball : processor_.Ball_set)
     {
 
+        //if (current_ball->id == 0)
+        //    continue;
+
         // double distance_hypot_blue_camera = std::hypot(current_ball->x - camera_position.x, current_ball->z - processor_.camera_position.z);
 
         cv::Point center(
@@ -51,19 +54,21 @@ void Canvas::drawOut(cv::Mat &canvas)
             antialias);
     }
 
-
     double a = DISTANCE_BETWEEN_BALL;
-    double b = processor_.Ball_set[2]->distances; // blue Ball
+    double b = processor_.Ball_set[0]->distances; // blue Ball
     double c = processor_.Ball_set[1]->distances; // green Ball
+
     double x = (b * b - a * a - c * c) / (2 * a); // x direction
     double z = std::sqrt(c * c - x * x); // z direction
+
     double x_offset = a / 2; // Offset
 
     cv::Point camera(
             static_cast<int>((x + x_offset) * scaler + tx),
             static_cast<int>(z * scaler + ty));
 
-
+    if (processor_.framecount > 1)
+    {
         processor_.drawPoints.push_back(camera);
         std::vector<cv::Point> pts;
         pts.reserve(processor_.drawPoints.size());
@@ -78,12 +83,10 @@ void Canvas::drawOut(cv::Mat &canvas)
             2,
             cv::LINE_AA
         );
-
-
-
+    }
 
     cv::circle(canvas, camera,
-                   10,
+                   3,
                    cv::Scalar(25, 25, 25),
                    cv::FILLED);
 }
