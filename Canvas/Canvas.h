@@ -6,8 +6,7 @@
 #include "../processor.h"
 #include <algorithm>
 
-
-class Canvas : Processor {
+class Canvas {
 public:
     cv::Mat draw2DCanvas(int width, int height, const cv::Scalar& background);
     void drawOut(cv::Mat& canvas);

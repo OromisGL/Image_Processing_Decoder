@@ -16,6 +16,7 @@
 #include <opencv2/imgproc.hpp>
 #include "opencv2/calib3d.hpp"
 #include <opencv2/viz/viz3d.hpp>
+#include "setter.h"
 
 
 struct color_count
@@ -101,6 +102,7 @@ public:
     static constexpr int threshold = 80;
     std::array<Ball*, 3> Ball_set;
     int framecount = 0;
+    cv::Mat distCoeffs = cv::Mat::zeros(1,4, CV_64F);
 
     // Drwaing
     void initializeBalls();
@@ -142,6 +144,13 @@ public:
     void video_loop(cv::VideoCapture &img);
 
     //Camera Settings and Virtual Camera
+    void create_undistort_camera(cv::Mat const& cameraMatrix, cv::Mat distCoeffs, cv::Size const& imgsize,
+                                        cv::Mat& out_map1, cv::Mat& out_map2);
+
+    cv::Mat camera_optimal_matrix();
+
+    cv::Mat camera();
+
     void virtual_camera_setting(double fov_deg);
 
     void orig_camera();

@@ -3,13 +3,13 @@
 //
 
 #pragma once
+#include <memory>
 
-#include "processor.h"
-#include "Canvas/Canvas.h"
+class Canvas;
+class Processor;
 
+void setSharedCanvas(std::shared_ptr<Canvas> ptr);
+void setSharedProcessor(std::shared_ptr<Processor> ptr);
 
-void setSharedCanvas(Canvas* ptr);
-void setSharedProcessor(Processor* ptr);
-
-Canvas& getCanvas();
-Processor& getProcessor();
+std::shared_ptr<Canvas> getCanvas();
+std::shared_ptr<Processor> getProcessor();

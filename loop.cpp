@@ -24,10 +24,13 @@ void Processor::video_loop(cv::VideoCapture& img)
 
     cv::Mat frame, out;
 
-    Canvas& canvas_ = getCanvas();
-    Processor& processor_ = getProcessor();
+    auto canvas_ = getCanvas();
+    auto processor_ = getProcessor();
 
-    //virtual_camera_setting(90);
+    cv::Mat rectfield = processor_->camera();
+    cv::Mat map1, map2;
+
+    cv::Mat undistorted;
 
     while (true)
     {
@@ -38,16 +41,18 @@ void Processor::video_loop(cv::VideoCapture& img)
 
         out.create(frame.size(), frame.type());
 
-        //out = applyVcam(frame);
-        processor_.framecount++;
-        canvas_.displayCanvas();
+        processor_->framecount++;
 
-        processor_.m_frame_processing(frame, out);
+        processor_->create_undistort_camera(rectfield, processor_->distCoeffs, frame.size(), map1, map2);
 
-        processor_.m_display_info(frame, out);
-        //draw_to_screen(out, screen.drawPoints);
+        cv::remap(frame, undistorted, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
 
-        //cv::imshow("video input", frame);
+        processor_->m_frame_processing(undistorted, out);
+        canvas_->displayCanvas();
+
+        processor_->m_display_info(undistorted, out);
+
+        cv::imshow("video input", undistorted);
         cv::imshow("video output", out);
 
 
