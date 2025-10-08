@@ -6,29 +6,30 @@
 #include "Canvas/Canvas.h"
 #include "setter.h"
 
-void Processor::video_loop(cv::VideoCapture& img)
+void Processor::video_loop(cv::VideoCapture &img)
 {
-
     cv::namedWindow("video input", cv::WINDOW_AUTOSIZE);
     cv::namedWindow("video output", cv::WINDOW_AUTOSIZE);
 
     int delay = 1;
     auto canvas = getCanvas();
-    auto processor = getProcessor();
 
-    cv::Mat camera_frame = processor->camera();
+    // Getting the CameraMatrix based on the frame information and Camera settings resulting from the FOVs
+    cv::Mat camera_frame = this->camera();
+    // Getting the original Camera Matrix with scaled frame size and distortion Koefficent
     cv::Mat kalib_camera = camera_optimal_matrix();
+    // Matrix for remapping the Picture
     cv::Mat map1, map2;
-
+    // output Matrix after applying the new Camera matrix
     cv::Mat undistorted;
 
-    processor->initializeBalls();
+    this->initializeBalls();
 
-    if (processor->Ball_set[0] == nullptr)
+    if (this->Ball_set[0] == nullptr)
     {
-        processor->Ball_set[2] = &processor->red_ball;
-        processor->Ball_set[1] = &processor->green_ball;
-        processor->Ball_set[0] = &processor->blue_ball;
+        this->Ball_set[2] = &this->red_ball;
+        this->Ball_set[1] = &this->green_ball;
+        this->Ball_set[0] = &this->blue_ball;
     }
 
     double fps = img.get(cv::CAP_PROP_FPS);
@@ -49,16 +50,29 @@ void Processor::video_loop(cv::VideoCapture& img)
 
         out.create(frame.size(), frame.type());
 
-        processor->framecount++;
+        this->framecount++;
 
-        processor->create_undistort_camera(camera_frame, kalib_camera, processor->distCoeffs, frame.size(), map1, map2);
+        this->create_undistort_camera(
+            camera_frame,
+            kalib_camera,
+            this->distCoeffs,
+            frame.size(),
+            map1,
+            map2);
 
-        cv::remap(frame, undistorted, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
+        cv::remap(
+            frame,
+            undistorted,
+            map1,
+            map2,
+            cv::INTER_LINEAR,
+            cv::BORDER_CONSTANT);
 
-        processor->m_frame_processing(undistorted, out);
+        this->m_frame_processing(undistorted, out);
+
         canvas->displayCanvas();
 
-        processor->m_display_info(undistorted, out);
+        this->m_display_info(undistorted, out);
 
         cv::imshow("video input", undistorted);
         cv::imshow("video output", out);

@@ -3,15 +3,32 @@
 //
 
 #include "processor.h"
-#include "setter.h"
+
+
+cv::VideoCapture Processor::in_video(const std::string& video_path)
+{
+    if (!std::filesystem::exists(video_path)) {
+        std::cerr << "Datei nicht gefunden: " << video_path << "\n";
+        return {};
+    }
+
+    cv::VideoCapture in_video(video_path, cv::CAP_ANY);
+
+    in_video.release();
+    if (in_video.open(video_path, cv::CAP_AVFOUNDATION) && in_video.isOpened()) {
+        std::cout << "Backend: " << in_video.getBackendName() << "\n";
+        return in_video;
+    }
+
+    std::cerr << "Konnte Video nicht öffnen: " << video_path << "\n";
+    return {};
+}
 
 void Processor::initializeBalls()
 {
-    auto processor = getProcessor();
-
-    processor->blue_ball.name = "blue";
-    processor->green_ball.name = "green";
-    processor->red_ball.name = "red";
+    this->blue_ball.name = "blue";
+    this->green_ball.name = "green";
+    this->red_ball.name = "red";
 
 
     const float triangle_length = DISTANCE_BETWEEN_BALL;
@@ -22,23 +39,23 @@ void Processor::initializeBalls()
     const float bottom = camera_position.PEN_HEIGHT - triangle_height / 3;
     const float top = camera_position.PEN_HEIGHT + triangle_height * 2 / 3;
 
-    processor->blue_ball.id = 0;
-    processor->blue_ball.x = left;
-    processor->blue_ball.y = bottom;
-    processor->blue_ball.z = 0;
-    processor->blue_ball.color = cv::Scalar(255, 0, 0);
+    this->blue_ball.id = 0;
+    this->blue_ball.x = left;
+    this->blue_ball.y = bottom;
+    this->blue_ball.z = 0;
+    this->blue_ball.color = cv::Scalar(255, 0, 0);
 
-    processor->green_ball.id = 1;
-    processor->green_ball.x = right;
-    processor->green_ball.y = bottom;
-    processor->green_ball.z = 0;
-    processor->green_ball.color = cv::Scalar(0,255,0);
+    this->green_ball.id = 1;
+    this->green_ball.x = right;
+    this->green_ball.y = bottom;
+    this->green_ball.z = 0;
+    this->green_ball.color = cv::Scalar(0,255,0);
 
-    processor->red_ball.id = 2;
-    processor->red_ball.x = 0;
-    processor->red_ball.y = top;
-    processor->red_ball.z = 0;
-    processor->red_ball.color = cv::Scalar(0,0,255);
+    this->red_ball.id = 2;
+    this->red_ball.x = 0;
+    this->red_ball.y = top;
+    this->red_ball.z = 0;
+    this->red_ball.color = cv::Scalar(0,0,255);
 }
 
 void Processor::draw_to_screen(cv::Mat& out, std::vector<cv::Point2d>& drawPoints)
@@ -70,10 +87,9 @@ void Processor::draw_line(cv::Mat& img, cv::Point2f p1, cv::Point2f p2, cv::Scal
 
 void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
 {
-    auto processor_ = getProcessor();
 
-    cv::Point2f blue_middle(processor_->blue_ball.middle.first,processor_->blue_ball.middle.second);
-    cv::Point2f green_middle(processor_->green_ball.middle.first, processor_->green_ball.middle.second);
+    cv::Point2f blue_middle(this->blue_ball.middle.first,this->blue_ball.middle.second);
+    cv::Point2f green_middle(this->green_ball.middle.first, this->green_ball.middle.second);
 
     cv::Point2f blue_green_center = middle_two_vek(blue_middle, green_middle);
 
@@ -87,11 +103,11 @@ void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
 
     double len_blue_green = vektor_length(blue_middle, green_middle);
 
-    double delta_blue = processor_->blue_ball.distances - processor_->camera_position.initial_blue_radii;
+    double delta_blue = this->blue_ball.distances - this->camera_position.initial_blue_radii;
 
     // Make Point for  Middle Point in the Frame
     const std::string label = cv::format("Red radii: %.6f  Green radii: %.6f  Blue radii: %.6f  Delta Blue %.6f",
-                                             processor_->red_ball.distances, processor_->green_ball.distances, processor_->blue_ball.distances, delta_blue);
+                                             this->red_ball.distances, this->green_ball.distances, this->blue_ball.distances, delta_blue);
 
     int baseline = 0;
     const int fontFace = cv::FONT_HERSHEY_SIMPLEX;
@@ -102,6 +118,44 @@ void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
     cv::Size sz = cv::getTextSize(label, fontFace, fontScale, thickness, &baseline);
 
     cv::Rect bg(10, 10, sz.width + 12, sz.height + baseline + 10);
+
+    cv::circle(
+        out,
+        {static_cast<int>(blue_green_center.x), static_cast<int>(blue_green_center.y)},
+        3, cv::Scalar(255,255,255),
+        cv::FILLED,
+        cv::LINE_AA
+        );
+
+    cv::circle(
+        out,
+        {static_cast<int>(this->blue_ball.middle.first), static_cast<int>(this->blue_ball.middle.second)},
+        static_cast<int>(this->blue_ball.distances), cv::Scalar(255,255,255),
+        1,
+        cv::LINE_AA);
+
+    cv::circle(
+        out,
+        {static_cast<int>(this->green_ball.middle.first), static_cast<int>(this->green_ball.middle.second)},
+        static_cast<int>(this->green_ball.distances), cv::Scalar(255,255,255),
+        1,
+        cv::LINE_AA);
+
+    cv::circle(
+        frame,
+        {static_cast<int>(this->red_ball.middle.first), static_cast<int>(this->red_ball.middle.second)},
+        5, cv::Scalar(255,255,255),
+        cv::FILLED,
+        cv::LINE_AA);
+
+
+
+
+    cv::rectangle(out, bg, cv::Scalar(255, 255, 255), cv::FILLED);
+
+    cv::putText(out, label,
+            cv::Point(bg.x + 6, bg.y + 6 + sz.height),
+            fontFace, fontScale, cv::Scalar(0, 0, 0), thickness, cv::LINE_AA);
 
     //draw_line(blue_ball, out);
     //draw_line(green_ball, out);
@@ -178,60 +232,4 @@ void Processor::m_display_info(cv::Mat& frame, cv::Mat& out)
     }
     */
 
-    cv::circle(
-        out,
-        {static_cast<int>(blue_green_center.x), static_cast<int>(blue_green_center.y)},
-        3, cv::Scalar(255,255,255),
-        cv::FILLED,
-        cv::LINE_AA
-        );
-
-    cv::circle(
-        out,
-        {static_cast<int>(processor_->blue_ball.middle.first), static_cast<int>(processor_->blue_ball.middle.second)},
-        static_cast<int>(processor_->blue_ball.distances), cv::Scalar(255,255,255),
-        1,
-        cv::LINE_AA);
-
-    cv::circle(
-        out,
-        {static_cast<int>(processor_->green_ball.middle.first), static_cast<int>(processor_->green_ball.middle.second)},
-        static_cast<int>(processor_->green_ball.distances), cv::Scalar(255,255,255),
-        1,
-        cv::LINE_AA);
-
-    cv::circle(
-        frame,
-        {static_cast<int>(processor_->red_ball.middle.first), static_cast<int>(processor_->red_ball.middle.second)},
-        5, cv::Scalar(255,255,255),
-        cv::FILLED,
-        cv::LINE_AA);
-
-
-
-
-    cv::rectangle(out, bg, cv::Scalar(255, 255, 255), cv::FILLED);
-
-    cv::putText(out, label,
-            cv::Point(bg.x + 6, bg.y + 6 + sz.height),
-            fontFace, fontScale, cv::Scalar(0, 0, 0), thickness, cv::LINE_AA);
-}
-
-cv::VideoCapture Processor::in_video(const std::string& video_path)
-{
-    if (!std::filesystem::exists(video_path)) {
-        std::cerr << "Datei nicht gefunden: " << video_path << "\n";
-        return {};
-    }
-
-    cv::VideoCapture in_video(video_path, cv::CAP_ANY);
-
-    in_video.release();
-    if (in_video.open(video_path, cv::CAP_AVFOUNDATION) && in_video.isOpened()) {
-        std::cout << "Backend: " << in_video.getBackendName() << "\n";
-        return in_video;
-    }
-
-    std::cerr << "Konnte Video nicht öffnen: " << video_path << "\n";
-    return {};
 }

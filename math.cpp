@@ -48,19 +48,18 @@ void Processor::crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output)
 
 
     cv::circle(out, P1, 3, cv::Scalar(255,255,255), cv::FILLED, cv::LINE_AA);
-    //cv::circle(out, P2, 3, cv::Scalar(255,255,255), cv::FILLED, cv::LINE_AA);
 
 }
 
 void Processor::middle_point(Ball& b)
 {
-    const auto n = b.field;
+    const auto n = static_cast<double>(b.field);
 
     if (n == 0)
         return;
 
-    b.middle.first = b.positions.x / static_cast<double>(n);
-    b.middle.second = b.positions.y / static_cast<double>(n);
+    b.middle.first = b.positions.x / n;
+    b.middle.second = b.positions.y / n;
 }
 
 void Processor::draw_line_to_camera(Ball& b, cv::Mat& img)

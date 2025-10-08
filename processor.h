@@ -70,39 +70,20 @@ struct INITIAL_CAMERA_POSITION
     float z = INITIAL_Z_OFFSET;
 };
 
-struct Intrinsics
-{
-    cv::Mat K; // 3x3, CV_64F
-    cv::Mat D; // 1x5 (pinhole) oder 1x4 (fisheye), CV_64F
-    cv::Size size; // Bildgröße der Originalaufnahme
-    bool fisheye = false;
-};
-
-struct VirtualCam
-{
-    cv::Mat Knew; // Ziel-Intrinsics (3x3, CV_64F)
-    cv::Mat map1, map2; // Remap-Tabellen
-    cv::Size outSize; // Zielgröße
-};
-
-
 class Processor
 {
 public:
     std::vector<cv::Point> drawPoints;
     INITIAL_CAMERA_POSITION camera_position;
-    VirtualCam Vcam;
-    Intrinsics Ocam;
-    cv::Mat K_orig_, D_;
     Screen screen;
     color_count count;
     Ball blue_ball, green_ball, red_ball;
     float BALL_RADIUS = 3;
     float DISTANCE_BETWEEN_BALL = 9;
     static constexpr int threshold = 80;
-    std::array<Ball*, 3> Ball_set;
+    std::array<Ball *, 3> Ball_set;
     int framecount = 0;
-    cv::Mat distCoeffs = cv::Mat::zeros(1,4, CV_64F);
+    cv::Mat distCoeffs = cv::Mat::zeros(1, 4, CV_64F);
 
     // Drwaing
     void initializeBalls();
@@ -134,7 +115,7 @@ public:
 
     cv::Point2d middle_two_vek(cv::Point2d p1, cv::Point2d p2);
 
-    cv::Point2d target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2);
+    cv::Point2d target_vek(Ball &b, cv::Point2f p1, cv::Point2f p2);
 
     // Test Function
     // cv::Mat image_color_field(const std::string& img_path, const std::string& img_name);
@@ -146,16 +127,13 @@ public:
     //Camera Settings and Virtual Camera
     cv::Mat K_calib_camera();
 
-    void create_undistort_camera(cv::Mat const& cameraMatrix, cv::Mat const& orig_camera_Matrix, cv::Mat distCoeffs, cv::Size const& imgsize,
-                                        cv::Mat& out_map1, cv::Mat& out_map2);
+    void create_undistort_camera(
+        cv::Mat const &cameraMatrix,
+        cv::Mat const &orig_camera_Matrix,
+        cv::Mat distCoeffs, cv::Size const &imgsize,
+        cv::Mat &out_map1, cv::Mat &out_map2);
 
     cv::Mat camera_optimal_matrix();
 
     cv::Mat camera();
-
-    void virtual_camera_setting(double fov_deg);
-
-    void orig_camera();
-
-    cv::Mat applyVcam(const cv::Mat &frame);
 };

@@ -19,11 +19,12 @@ int main()
     // Start Video read
     cv::VideoCapture video = processor->in_video(img_path);
 
-    if (cv::VideoCapture V(0); !V.isOpened()) { // Check if the webcam is opened
-        std::cerr << "Error: Webcam not detected!" << std::endl;
-        return -1;
-    }
-
     //Start Videoloop
     processor->video_loop(video);
+
+    //if (cv::VideoCapture V(0); !V.isOpened()) { // Check if the webcam is opened
+    //    std::cerr << "Error: Webcam not detected!" << std::endl;
+    //    return -1;
+    //}
+
 }

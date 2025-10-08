@@ -5,20 +5,17 @@
 #include "processor.h"
 #include "Canvas/Canvas.h"
 #include <memory>
-#include "setter.h"
 
 void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
 {
-    auto processor = getProcessor();
-
     // Reset the Positional informations
-    processor->blue_ball.positions.x = 0;
-    processor->green_ball.positions.x = 0;
-    processor->red_ball.positions.x = 0;
+    this->blue_ball.positions.x = 0;
+    this->green_ball.positions.x = 0;
+    this->red_ball.positions.x = 0;
 
-    processor->blue_ball.positions.y = 0;
-    processor->green_ball.positions.y = 0;
-    processor->red_ball.positions.y = 0;
+    this->blue_ball.positions.y = 0;
+    this->green_ball.positions.y = 0;
+    this->red_ball.positions.y = 0;
 
     uint32_t blue_field = 0, green_field = 0, red_field = 0;
 
@@ -43,9 +40,24 @@ void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
             int newG = diffG > threshold ? 255 : 0;
             int newR = diffR > threshold ? 255 : 0;
 
-            if (newB == 255){ blue_field += 1; processor->blue_ball.positions.x += x;  processor->blue_ball.positions.y += y; }
-            else if (newG == 255){ green_field += 1; processor->green_ball.positions.x += x;  processor->green_ball.positions.y += y; }
-            else if (newR == 255){ red_field += 1; processor->red_ball.positions.x += x;  processor->red_ball.positions.y += y; }
+            if (newB == 255)
+            {
+                blue_field += 1;
+                this->blue_ball.positions.x += x;
+                this->blue_ball.positions.y += y;
+            }
+            else if (newG == 255)
+            {
+                green_field += 1;
+                this->green_ball.positions.x += x;
+                this->green_ball.positions.y += y;
+            }
+            else if (newR == 255)
+            {
+                red_field += 1;
+                this->red_ball.positions.x += x;
+                this->red_ball.positions.y += y;
+            }
 
             out_row[x] = cv::Vec3b(
                 static_cast<uchar>(newB),
@@ -56,42 +68,47 @@ void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
     }
 
     // Area based of the Ball Color informations
-    processor->blue_ball.field = static_cast<int>(blue_field);
-    processor->green_ball.field = static_cast<int>(green_field);
-    processor->red_ball.field = static_cast<int>(red_field);
+    this->blue_ball.field = static_cast<int>(blue_field);
+    this->green_ball.field = static_cast<int>(green_field);
+    this->red_ball.field = static_cast<int>(red_field);
 
     // Calculationg the middle in x y
-    middle_point(processor->blue_ball);
-    middle_point(processor->green_ball);
-    middle_point(processor->red_ball);
+    middle_point(this->blue_ball);
+    middle_point(this->green_ball);
+    middle_point(this->red_ball);
 
     // Getting the radius from the Area
-    processor->blue_ball.radius = std::sqrt(static_cast<double>(processor->blue_ball.field) / M_PI);
-    processor->green_ball.radius = std::sqrt(static_cast<double>(processor->green_ball.field) / M_PI);
-    processor->red_ball.radius = std::sqrt(static_cast<double>(processor->red_ball.field) / M_PI);
+    this->blue_ball.radius = std::sqrt(static_cast<double>(this->blue_ball.field) / M_PI);
+    this->green_ball.radius = std::sqrt(static_cast<double>(this->green_ball.field) / M_PI);
+    this->red_ball.radius = std::sqrt(static_cast<double>(this->red_ball.field) / M_PI);
 
     // Init the radii to get the Ratio
-    if (processor->camera_position.initial_blue_radii == 0.0 || processor->camera_position.initial_green_radii == 0.0)
+    if (this->camera_position.initial_blue_radii == 0.0 ||
+        this->camera_position.initial_green_radii == 0.0)
     {
-        processor->camera_position.initial_blue_radii = processor->blue_ball.radius;
-        processor->camera_position.initial_green_radii = processor->green_ball.radius;
+        this->camera_position.initial_blue_radii = this->blue_ball.radius;
+        this->camera_position.initial_green_radii = this->green_ball.radius;
     }
 
     // Init the distance
-    if (processor->camera_position.initial_blue_distance == 0.0 || processor->camera_position.initial_green_distance == 0.0)
+    if (this->camera_position.initial_blue_distance == 0.0 ||
+        this->camera_position.initial_green_distance == 0.0)
     {
-        processor->camera_position.initial_blue_distance = euclidian_distance_3D(processor->blue_ball, processor->camera_position);
-        processor->camera_position.initial_green_distance = euclidian_distance_3D(processor->green_ball, camera_position);
+        this->camera_position.initial_blue_distance = euclidian_distance_3D(
+            this->blue_ball,
+            this->camera_position);
+        this->camera_position.initial_green_distance = euclidian_distance_3D(
+            this->green_ball,
+            this->camera_position);
     }
 
     // Calculating the Ratio of the Current radii to the initial radii
-    double blue_ratio = processor->camera_position.initial_blue_radii / processor->blue_ball.radius;
-    double green_ratio = processor->camera_position.initial_green_radii / processor->green_ball.radius;
+    double blue_ratio = this->camera_position.initial_blue_radii / this->blue_ball.radius;
+    double green_ratio = this->camera_position.initial_green_radii / this->green_ball.radius;
 
     // getting the right distance based on the ratio
-    processor->blue_ball.distances = processor->camera_position.initial_blue_distance * blue_ratio;
-    processor->green_ball.distances = processor->camera_position.initial_green_distance * green_ratio;
-
+    this->blue_ball.distances = this->camera_position.initial_blue_distance * blue_ratio;
+    this->green_ball.distances = this->camera_position.initial_green_distance * green_ratio;
 }
 
 /* Test function
