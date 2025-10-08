@@ -19,14 +19,11 @@ int main()
     // Start Video read
     cv::VideoCapture video = processor->in_video(img_path);
 
-    // init Default Values of the Balls
-    processor->initializeBalls();
-
-    if (processor->Ball_set[0] == nullptr)
-    {
-        processor->Ball_set[2] = &processor->red_ball;
-        processor->Ball_set[1] = &processor->green_ball;
-        processor->Ball_set[0] = &processor->blue_ball;
+    if (cv::VideoCapture V(0); !V.isOpened()) { // Check if the webcam is opened
+        std::cerr << "Error: Webcam not detected!" << std::endl;
+        return -1;
     }
+
+    //Start Videoloop
     processor->video_loop(video);
 }

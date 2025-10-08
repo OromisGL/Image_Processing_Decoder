@@ -134,7 +134,7 @@ public:
 
     cv::Point2d middle_two_vek(cv::Point2d p1, cv::Point2d p2);
 
-    cv::Point2d target_vek(Ball &b, cv::Point2f p1, cv::Point2f p2);
+    cv::Point2d target_vek(Ball& b, cv::Point2f p1, cv::Point2f p2);
 
     // Test Function
     // cv::Mat image_color_field(const std::string& img_path, const std::string& img_name);
@@ -144,7 +144,9 @@ public:
     void video_loop(cv::VideoCapture &img);
 
     //Camera Settings and Virtual Camera
-    void create_undistort_camera(cv::Mat const& cameraMatrix, cv::Mat distCoeffs, cv::Size const& imgsize,
+    cv::Mat K_calib_camera();
+
+    void create_undistort_camera(cv::Mat const& cameraMatrix, cv::Mat const& orig_camera_Matrix, cv::Mat distCoeffs, cv::Size const& imgsize,
                                         cv::Mat& out_map1, cv::Mat& out_map2);
 
     cv::Mat camera_optimal_matrix();

@@ -14,8 +14,6 @@ double Processor::get_delta(Ball& b)
     return b.distances;
 }
 
-
-
 void Processor::crossing_point(cv::Mat& out, std::vector<cv::Point2d>& output)
 {
     cv::Point2d blue_middle(blue_ball.x, blue_ball.y);

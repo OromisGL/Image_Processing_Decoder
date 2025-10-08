@@ -7,11 +7,11 @@
 
 void Canvas::displayCanvas()
 {
-    auto processor_ = getProcessor();
+    auto processor = getProcessor();
 
     cv::Mat canvas = draw2DCanvas(
-        processor_->screen.width * 2,
-        processor_->screen.height * 2,
+        processor->screen.width * 2,
+        processor->screen.height * 2,
         cv::Scalar(255, 255, 255));
 
     drawOut(canvas);
@@ -29,18 +29,18 @@ cv::Mat Canvas::draw2DCanvas(int width, int height, const cv::Scalar &background
 
 void Canvas::drawOut(cv::Mat &canvas)
 {
-    auto processor_ = getProcessor();
+    auto processor = getProcessor();
 
     const int antialias = cv::LINE_AA;
-    int tx = (processor_->screen.height * 2) / 2;
-    int ty = (processor_->screen.width * 2) / 5;
+    int tx = (processor->screen.height * 2) / 2;
+    int ty = (processor->screen.width * 2) / 5;
     float scaler = 40;
     // float ratio =  screen.width / screen.height;
 
     // double delta_blue = processor_.blue_ball.distances - processor_.camera_position.initial_blue;
     // double delta_green = processor_.green_ball.distances - processor_.camera_position.initial_green;
 
-    for (const auto& current_ball : processor_->Ball_set)
+    for (const auto& current_ball : processor->Ball_set)
     {
 
         cv::Point center(
@@ -50,7 +50,7 @@ void Canvas::drawOut(cv::Mat &canvas)
         cv::circle(
             canvas,
             center,
-            processor_->BALL_RADIUS * scaler,
+            processor->BALL_RADIUS * scaler,
             current_ball->color,
             cv::FILLED,
             antialias);
@@ -64,25 +64,29 @@ void Canvas::drawOut(cv::Mat &canvas)
             antialias);
     }
 
-    double a = processor_->DISTANCE_BETWEEN_BALL;
-    double b = processor_->Ball_set[0]->distances; // blue Ball
-    double c = processor_->Ball_set[1]->distances; // green Ball
+    // Triangle to the Camera position
+    double a = processor->DISTANCE_BETWEEN_BALL;
+    double b = processor->Ball_set[0]->distances; // blue Ball
+    double c = processor->Ball_set[1]->distances; // green Ball
 
+    // getting the x and y Komponents of the Camera Position
     double x = (b * b - a * a - c * c) / (2 * a); // x direction
     double z = std::sqrt(c * c - x * x); // z direction
 
-    double x_offset = a / 2; // Offset
+    // adding a x offset to get the center of the Triangle
+    double x_offset = a / 2;
 
     cv::Point camera(
             static_cast<int>((x + x_offset) * scaler + tx),
             static_cast<int>(z * scaler + ty));
 
-    if (processor_->framecount > 1)
+    // Start drawing the lines on the Canvas
+    if (processor->framecount > 1)
     {
-        processor_->drawPoints.push_back(camera);
+        processor->drawPoints.push_back(camera);
         std::vector<cv::Point> pts;
-        pts.reserve(processor_->drawPoints.size());
-        for (const auto& p : processor_->drawPoints)
+        pts.reserve(processor->drawPoints.size());
+        for (const auto& p : processor->drawPoints)
             pts.emplace_back(cvRound(p.x), cvRound(p.y));
 
         cv::polylines(
