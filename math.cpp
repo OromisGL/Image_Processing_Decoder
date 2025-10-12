@@ -9,6 +9,27 @@ int screen_x = 1280 / 2;
 int screen_y = 720 / 2;
 
 
+bool Processor::locate_point(cv::Point& p)
+{
+    int x0 = (p.x / 5) * 5;
+    int y0 = (p.y / 5) * 5;
+
+    for (int i = -5; i <= 5; i++)
+    {
+        for (int j = -5; j <= 5; j++)
+        {
+            int dx = p.x + j;
+            int dy = p.y + i;
+            if (dx > 0 && dx <= screen.width &&
+                dy > 0 && dy <= screen.height)
+            {
+
+            }
+        }
+    }
+    return false;
+}
+
 double Processor::get_delta(Ball& b)
 {
     return b.distances;

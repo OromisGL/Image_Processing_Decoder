@@ -34,7 +34,7 @@ void Canvas::drawOut(cv::Mat &canvas)
     const int antialias = cv::LINE_AA;
     int tx = (processor->screen.height * 2) / 2;
     int ty = (processor->screen.width * 2) / 5;
-    float scaler = 40;
+    double scaler = 40.;
     // float ratio =  screen.width / screen.height;
 
     // double delta_blue = processor_.blue_ball.distances - processor_.camera_position.initial_blue;
@@ -76,27 +76,30 @@ void Canvas::drawOut(cv::Mat &canvas)
     // adding a x offset to get the center of the Triangle
     double x_offset = a / 2;
 
-    cv::Point camera(
-            static_cast<int>((x + x_offset) * scaler + tx),
-            static_cast<int>(z * scaler + ty));
+    cv::Point2d camera(
+            (x + x_offset) * scaler + tx,
+            z * scaler + ty);
 
     // Start drawing the lines on the Canvas
-    if (processor->framecount > 1)
+    if (processor->framecount > 1 || processor->framecount % 10 == 0)
     {
         processor->drawPoints.push_back(camera);
-        std::vector<cv::Point> pts;
-        pts.reserve(processor->drawPoints.size());
-        for (const auto& p : processor->drawPoints)
-            pts.emplace_back(cvRound(p.x), cvRound(p.y));
 
-        cv::polylines(
-            canvas,
-            std::vector<std::vector<cv::Point>>{pts},
-            false,
-            cv::Scalar(25,25,25),
-            2,
-            cv::LINE_AA
-        );
+        for (auto& p_camera : processor->drawPoints)
+        {
+            for (int y = 0; y < canvas.rows; y++)
+            {
+                continue;
+            }
+        }
+
+        for (std::size_t index = 1; index < processor->drawPoints.size(); ++index)
+        {
+            const cv::Point2d previous_point = processor->drawPoints[index - 1];
+            const cv::Point2d current_point = processor->drawPoints[index];
+
+            cv::line(canvas, previous_point, current_point, cv::Scalar(25,25,25), 2, cv::LINE_AA);
+        }
     }
 
     cv::circle(canvas, camera,

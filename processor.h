@@ -14,7 +14,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include "opencv2/calib3d.hpp"
+#include <opencv2/calib3d.hpp>
 #include <opencv2/viz/viz3d.hpp>
 #include "setter.h"
 
@@ -73,7 +73,7 @@ struct INITIAL_CAMERA_POSITION
 class Processor
 {
 public:
-    std::vector<cv::Point> drawPoints;
+    std::vector<cv::Point2d> drawPoints;
     INITIAL_CAMERA_POSITION camera_position;
     Screen screen;
     color_count count;
@@ -81,7 +81,7 @@ public:
     float BALL_RADIUS = 3;
     float DISTANCE_BETWEEN_BALL = 9;
     static constexpr int threshold = 80;
-    std::array<Ball *, 3> Ball_set;
+    std::array<Ball*, 3> Ball_set;
     int framecount = 0;
     cv::Mat distCoeffs = cv::Mat::zeros(1, 4, CV_64F);
 
@@ -100,6 +100,8 @@ public:
     void m_frame_processing(cv::Mat &input, cv::Mat &output);
 
     // Math Functions
+    bool locate_point(cv::Point& p);
+
     void middle_point(Ball &b);
 
     void crossing_point(cv::Mat &out, std::vector<cv::Point2d> &output);

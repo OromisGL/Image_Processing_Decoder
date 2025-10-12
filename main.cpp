@@ -3,6 +3,7 @@
 #include "Canvas/Canvas.h"
 #include <memory>
 #include "setter.h"
+#include "Simulation.h"
 
 int main()
 {
@@ -11,16 +12,22 @@ int main()
 
     auto canvas = std::make_shared<Canvas>();
     auto processor = std::make_shared<Processor>();
+    auto simulation = std::make_shared<Simulation>();
+
 
     // Shared Pointer of Processor and Canvas
     setSharedCanvas(canvas);
     setSharedProcessor(processor);
 
     // Start Video read
-    cv::VideoCapture video = processor->in_video(img_path);
+    //cv::VideoCapture video = processor->in_video(img_path);
+
+    // Simulation
+    simulation->Simulation_loop();
 
     //Start Videoloop
-    processor->video_loop(video);
+    // processor->video_loop(sim_video);
+
 
     //if (cv::VideoCapture V(0); !V.isOpened()) { // Check if the webcam is opened
     //    std::cerr << "Error: Webcam not detected!" << std::endl;

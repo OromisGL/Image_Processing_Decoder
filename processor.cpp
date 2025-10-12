@@ -88,6 +88,10 @@ void Processor::m_frame_processing(cv::Mat &input, cv::Mat &output)
     {
         this->camera_position.initial_blue_radii = this->blue_ball.radius;
         this->camera_position.initial_green_radii = this->green_ball.radius;
+
+        std::cout << "blue radii: " << blue_ball.radius <<
+            "green radii: " << green_ball.radius <<
+                "red radii: " << red_ball.radius << std::endl;
     }
 
     // Init the distance
